@@ -3,7 +3,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 export const baseUrl =
   process.env.NODE_ENV === 'production'
     ? `${BASE_URL}/`
-    : 'http://localhost:3000/'
+    : 'http://localhost:3000'
 
 export const siteName = 'Boilerplate'
 

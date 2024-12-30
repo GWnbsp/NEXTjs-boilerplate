@@ -98,18 +98,23 @@ export default function CustomFormField({
   const [open, setOpen] = React.useState(false)
   const [data, setData] = React.useState(props?.data || [])
 
-  const getData = ApiCall({
-    key: [props?.url!],
-    method: 'GET',
-    url: props?.url + `&q=${search}`,
-  })?.get
+  // 只在需要远程数据的情况下才初始化 getData
+  const getData = props?.url
+    ? ApiCall({
+      key: [props.url],
+      method: 'GET',
+      url: `${props.url}&q=${search}`,
+    })?.get
+    : null
 
   const [value] = useDebounce(search, 1000)
 
   React.useEffect(() => {
     if (
-      (props?.fieldType && props?.fieldType === 'command') ||
-      (props?.data?.length === 0 && props?.fieldType !== 'multipleCheckbox')
+      props?.url &&
+      getData &&
+      ((props?.fieldType === 'command') ||
+        (props?.data?.length === 0 && props?.fieldType !== 'multipleCheckbox'))
     ) {
       getData?.refetch()?.then((res) => {
         setData(
@@ -157,10 +162,10 @@ export default function CustomFormField({
                                 return checked
                                   ? field.onChange([...field.value, child.id])
                                   : field.onChange(
-                                      field.value?.filter(
-                                        (value: string) => value !== child.id
-                                      )
+                                    field.value?.filter(
+                                      (value: string) => value !== child.id
                                     )
+                                  )
                               }}
                             />
                           </FormControl>
@@ -210,7 +215,7 @@ export default function CustomFormField({
                     >
                       {field.value
                         ? data?.find((item) => item.value === field.value)
-                            ?.label
+                          ?.label
                         : 'Select item'}
                       <FaSort className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                     </Button>
